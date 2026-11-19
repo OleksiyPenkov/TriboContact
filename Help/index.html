@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome &mdash; TriboContact Manual &amp; Physics Reference</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="images/logo.png" type="image/png">
+</head>
+<body>
+
+<header class="site-header">
+  <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+  <img src="images/logo.png" alt="APS Technology" class="logo">
+  <div class="title">TriboContact <span>User Manual &amp; Physics Reference</span></div>
+</header>
+
+<aside class="sidebar">
+  <nav>
+    <ul>
+      <li><span class="nav-section">Overview</span></li>
+      <li><a href="index.html" class="active">Welcome &amp; Architecture</a></li>
+      <li><a href="getting-started.html">GUI &amp; CLI Guide</a></li>
+      <li><span class="nav-section">Contact Mechanics Physics</span></li>
+      <li><a href="physics-hertz.html">Classical Hertz Baselines</a></li>
+      <li><a href="physics-elastic-layered.html">Layered Elastic Solver (Engine 1)</a></li>
+      <li><a href="physics-fem-plasticity.html">CalculiX Elastic-Plastic FEM (Engine 2)</a></li>
+      <li><span class="nav-section">Reference</span></li>
+      <li><a href="materials-and-units.html">Materials &amp; Units</a></li>
+      <li><a href="verification-and-references.html">Validation &amp; Literature References</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <div class="content-body">
+
+    <h1>TriboContact User Manual &amp; Physics Reference</h1>
+    <p class="page-subtitle">Contact mechanics for spherical indentation and sliding on single-layer and N-layer coated substrates</p>
+
+    <p>
+      <strong>TriboContact</strong> is a standalone contact-mechanics workbench for analyzing ball-on-flat
+      tribotests on single-layer and multilayer coated specimens. Given a spherical indenter, normal load,
+      optional sliding friction coefficient, and an arbitrary stack of N coating layers over a substrate,
+      TriboContact always evaluates two classical <strong>Hertz baselines</strong> together with two
+      complementary coated solvers: a fast semi-analytical <strong>Layered Elastic solver (Engine 1)</strong>
+      and an automated <strong>CalculiX Axisymmetric Elastic-Plastic FEM solver (Engine 2)</strong>.
+    </p>
+
+    <h2>Solver Architecture</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Solver / Baseline</th>
+          <th>Method</th>
+          <th>Assumptions &amp; Strengths</th>
+          <th>Key Outputs</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Hertz Substrate</strong></td>
+          <td>Closed-form analytical sphere-on-half-space</td>
+          <td>Ignores all coatings; lower/upper bound for very thin coatings (<em>h / a &laquo; 1</em>)</td>
+          <td><em>a</em>, &delta;, <em>p</em><sub>0</sub>, <em>p</em><sub>mean</sub>, centerline &sigma;<sub>vM</sub></td>
+        </tr>
+        <tr>
+          <td><strong>Hertz Top Film</strong></td>
+          <td>Closed-form analytical using top coating <em>E</em><sub>1</sub>, &nu;<sub>1</sub></td>
+          <td>Semi-infinite top coating limit; bound for very thick coatings (<em>h / a &raquo; 1</em>)</td>
+          <td><em>a</em>, &delta;, <em>p</em><sub>0</sub>, <em>p</em><sub>mean</sub>, centerline &sigma;<sub>vM</sub></td>
+        </tr>
+        <tr>
+          <td><strong>Engine 1: Layered Elastic</strong></td>
+          <td>Hankel Stiffness Matrix Method (SMM) + Polonsky-Keer CG + Hamilton sliding</td>
+          <td>Exact N-layer linear elasticity in milliseconds; resolves interface stress jumps and 3D sliding tensile peaks</td>
+          <td><em>p(r)</em>, 2D (&sigma;<sub>rr</sub>, &sigma;<sub>&theta;&theta;</sub>, &sigma;<sub>zz</sub>, &tau;<sub>rz</sub>, &sigma;<sub>vM</sub>), <em>z<sub>k</sub></em><sup>&minus;</sup>/<em>z<sub>k</sub></em><sup>+</sup> interfaces, yield ratio</td>
+        </tr>
+        <tr>
+          <td><strong>Engine 2: CalculiX FEM</strong></td>
+          <td>2D axisymmetric graded quad mesh (<code>CAX4</code>) with <code>NLGEOM</code> and J2 plasticity</td>
+          <td>Captures substrate/film yielding, strain hardening, contact spreading, plastic bending of hard films, and unloading</td>
+          <td>Plastic <em>p(r)</em>, <code>PEEQ</code>, residual depth <em>h<sub>r</sub></em>, unsmoothed per-region interface stresses</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout info">
+      <div class="callout-title">Consistent Internal Solver Units</div>
+      Both solvers use an exact coherent unit triad where <strong>1 GPa &middot; &mu;m<sup>2</sup> = 1 mN</strong>:
+      lengths in <strong>&mu;m</strong>, stress and elastic moduli in <strong>GPa</strong>, and forces in <strong>mN</strong>.
+      User inputs in <code>mm</code>, <code>nm</code>, <code>N</code>, or <code>MPa</code> are converted automatically at the interface boundary.
+    </div>
+
+    <h2>Manual Chapters</h2>
+
+    <div class="chapter-grid">
+      <a href="getting-started.html" class="chapter-card">
+        <strong>1. GUI &amp; CLI Guide</strong>
+        <p>Workflows for defining balls, N-layer stacks, substrates, background solves, load sweeps, and CSV/JSON/PNG/PDF exports.</p>
+      </a>
+      <a href="physics-hertz.html" class="chapter-card">
+        <strong>2. Classical Hertz Baselines</strong>
+        <p>Exact analytical equations for reduced modulus, contact radius, pressure distribution, subsurface shear, and yield onset.</p>
+      </a>
+      <a href="physics-elastic-layered.html" class="chapter-card">
+        <strong>3. Layered Elastic Solver (Engine 1)</strong>
+        <p>Hankel Stiffness Matrix Method, asymptotic splitting, Polonsky-Keer CG contact, interface stress jumps, and 3D sliding friction.</p>
+      </a>
+      <a href="physics-fem-plasticity.html" class="chapter-card">
+        <strong>4. CalculiX Elastic-Plastic FEM</strong>
+        <p>Graded conforming meshes, 2&deg; axisymmetric wedge scaling, penalty contact, secant load matching, and J2 plasticity.</p>
+      </a>
+      <a href="materials-and-units.html" class="chapter-card">
+        <strong>5. Materials &amp; Units</strong>
+        <p>Full table of 24 built-in ball, coating, and substrate presets, Tabor yield estimation, and custom preset storage.</p>
+      </a>
+      <a href="verification-and-references.html" class="chapter-card">
+        <strong>6. Validation &amp; References</strong>
+        <p>Benchmark suite T1&ndash;T8 tolerances, solver assumptions and limitations, and primary contact-mechanics citations.</p>
+      </a>
+    </div>
+
+    <h2>Quick Start</h2>
+
+    <ol class="steps">
+      <li><strong>Select or configure a case</strong> &mdash; Open <code>File &gt; Examples</code> (such as <em>TiN 2 &mu;m on 304 Steel</em> or <em>DLC 1.5 &mu;m on Glass</em>) or set ball diameter, load, friction, coating layers, and substrate in the left input panel.</li>
+      <li><strong>Verify CalculiX (for Engine 2)</strong> &mdash; Check the status bar. If CalculiX is not yet installed, click <code>Setup CalculiX</code> on the toolbar or run <code>TriboContactCLI.exe setup-ccx</code>.</li>
+      <li><strong>Run the simulation</strong> &mdash; Click <code>Run Solve</code> or press <kbd>F5</kbd>. Engine 1 runs first, and Engine 2 automatically runs in a background thread with live log streaming.</li>
+      <li><strong>Inspect contact, interface, and yield data</strong> &mdash; Review the summary comparison table, yield warning banner, dual-sided interface table (<em>z<sub>k</sub></em><sup>&minus;</sup> and <em>z<sub>k</sub></em><sup>+</sup>), and interactive plot tabs.</li>
+    </ol>
+
+    <div class="page-nav">
+      <a href="getting-started.html" class="next">Next: GUI &amp; CLI Guide &rarr;</a>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  APS Technology &mdash; TriboContact Help &amp; Physics Reference
+</footer>
+
+</body>
+</html>

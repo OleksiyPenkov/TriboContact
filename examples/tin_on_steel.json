@@ -1,0 +1,50 @@
+{
+  "case_name": "TiN 2um on 304 Steel (Si3N4 6mm, 5N)",
+  "ball": {
+    "radius_um": 3000.0,
+    "material": {
+      "name": "Si3N4",
+      "E_gpa": 310.0,
+      "nu": 0.27,
+      "hardness_gpa": 16.0,
+      "category": "ball"
+    },
+    "rigid": false
+  },
+  "layers": [
+    {
+      "material": {
+        "name": "TiN",
+        "E_gpa": 450.0,
+        "nu": 0.25,
+        "sigma_y_gpa": 7.5,
+        "hardness_gpa": 24.0,
+        "category": "coating"
+      },
+      "thickness_um": 2.0
+    }
+  ],
+  "substrate": {
+    "name": "304 Steel",
+    "E_gpa": 193.0,
+    "nu": 0.29,
+    "sigma_y_gpa": 0.29,
+    "E_t_gpa": 2.0,
+    "hardness_gpa": 2.0,
+    "category": "substrate"
+  },
+  "load_case": {
+    "normal_load_mn": 5000.0,
+    "friction_coeff": 0.0
+  },
+  "solver": {
+    "engine": "both",
+    "n_rings": 160,
+    "mesh_density": "standard",
+    "element_type": "CAX4",
+    "include_unloading": false,
+    "max_load_brackets": 3,
+    "load_tolerance_rel": 0.01,
+    "timeout_s": 300
+  }
+}

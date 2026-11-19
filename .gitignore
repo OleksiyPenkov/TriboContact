@@ -1,0 +1,54 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+
+# Local solver binaries and FEM scratch runs
+bin/
+runs/
+*.frd
+*.dat
+*.cvg
+*.sta
+*.12d
+*.rout
+*.rin
+*.msh
+
+# Local agent and IDE state
+.claude/settings.local.json
+.vscode/
+.idea/
+
+# Data safety
+data/local/
+*.csv
+*.xlsx
+!data/materials.json
+
+# Delphi build artifacts and IDE state
+out/
+*.dcu
+*.exe
+*.res
+*.rsm
+*.drc
+*.map
+*.tvsconfig
+*.stat
+*.dproj.local
+*.identcache
+*.dsk
+*.dsv
+*.~*
+__history/
+__recovery/
+dunitx-results.xml
+Artwork/__pycache__/
+

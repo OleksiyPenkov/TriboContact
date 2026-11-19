@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validation &amp; Literature References &mdash; TriboContact</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="images/logo.png" type="image/png">
+</head>
+<body>
+
+<header class="site-header">
+  <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+  <img src="images/logo.png" alt="APS Technology" class="logo">
+  <div class="title">TriboContact <span>User Manual &amp; Physics Reference</span></div>
+</header>
+
+<aside class="sidebar">
+  <nav>
+    <ul>
+      <li><span class="nav-section">Overview</span></li>
+      <li><a href="index.html">Welcome &amp; Architecture</a></li>
+      <li><a href="getting-started.html">GUI &amp; CLI Guide</a></li>
+      <li><span class="nav-section">Contact Mechanics Physics</span></li>
+      <li><a href="physics-hertz.html">Classical Hertz Baselines</a></li>
+      <li><a href="physics-elastic-layered.html">Layered Elastic Solver (Engine 1)</a></li>
+      <li><a href="physics-fem-plasticity.html">CalculiX Elastic-Plastic FEM (Engine 2)</a></li>
+      <li><span class="nav-section">Reference</span></li>
+      <li><a href="materials-and-units.html">Materials &amp; Units</a></li>
+      <li><a href="verification-and-references.html" class="active">Validation &amp; Literature References</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <div class="content-body">
+
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> <span class="sep">&rsaquo;</span> Validation &amp; Literature References
+    </div>
+
+    <h1>Verification, Validation &amp; Literature References</h1>
+    <p class="page-subtitle">Automated V&amp;V benchmark acceptance tolerances (T1&ndash;T8) and foundational scientific literature</p>
+
+    <h2>Verification &amp; Validation Matrix (<code>TriboContactCLI validate</code>)</h2>
+
+    <p>Every release of TriboContact must pass all eight quantitative benchmarks in the automated test suite:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Benchmark</th>
+          <th>Acceptance Criterion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>T1</strong></td>
+          <td>Engine 1 homogeneous Hertz limit (<em>E<sub>f</sub> = E<sub>s</sub>, &nu;<sub>f</sub> = &nu;<sub>s</sub></em>, 1, 2, 3 layers)</td>
+          <td><em>a</em>, &delta;, <em>p</em><sub>0</sub> within <strong>&lt; 0.2%</strong> of Hertz; centerline &sigma;<sub>vM</sub> within <strong>&lt; 0.5%</strong></td>
+        </tr>
+        <tr>
+          <td><strong>T2</strong></td>
+          <td>Engine 1 thin &amp; thick asymptotes (<em>h / a</em> = 0.001 and <em>h / a</em> = 20)</td>
+          <td>Within <strong>&lt; 1%</strong> of <code>hertz_substrate</code> and <code>hertz_top_film</code> respectively</td>
+        </tr>
+        <tr>
+          <td><strong>T3</strong></td>
+          <td>O'Sullivan &amp; King (1988) layered elastic trends (<em>E<sub>f</sub> / E<sub>s</sub></em> &isin; {0.5, 2, 4}, <em>h / a</em> &isin; {0.5, 1.0, 2.0})</td>
+          <td>Monotonic stiffening/softening trends, interface jump, and match vs. elastic Engine 2 within <strong>&lt; 3%</strong></td>
+        </tr>
+        <tr>
+          <td><strong>T4</strong></td>
+          <td>Hamilton (1983) 3D sliding sphere (&mu; = 0.25, 0.5, homogeneous)</td>
+          <td>Trailing-edge surface peak tensile stress &sigma;<sub><em>xx</em></sub>(&minus;<em>a</em>, 0, 0) within <strong>&lt; 1%</strong> of analytical formula</td>
+        </tr>
+        <tr>
+          <td><strong>T5</strong></td>
+          <td>Engine 2 CalculiX homogeneous elastic Hertz</td>
+          <td><em>a</em>, &delta;, <em>p</em><sub>0</sub> within <strong>&lt; 2%</strong> of Hertz; pressure-integral force balance error <strong>&lt; 2%</strong></td>
+        </tr>
+        <tr>
+          <td><strong>T6</strong></td>
+          <td>Cross-solver agreement (Engine 1 vs. elastic Engine 2, <em>E<sub>f</sub> / E<sub>s</sub></em> = 4 and 10)</td>
+          <td><em>a</em>, &delta;, <em>p</em><sub>max</sub>, and interface &sigma;<sub><em>rr</em></sub>(<em>z</em><sub>1</sub><sup>&minus;</sup>), &tau;<sub><em>rz</em></sub>(<em>z</em><sub>1</sub>) within <strong>&lt; 3%</strong></td>
+        </tr>
+        <tr>
+          <td><strong>T7</strong></td>
+          <td>Engine 2 elastic-plastic validation</td>
+          <td>Homogeneous yield onset near <em>p</em><sub>0</sub> &approx; 1.6&thinsp;&sigma;<sub><em>Y</em></sub>; Tabor plateau <em>p</em><sub>mean</sub> &approx; 2.8&ndash;3.0&thinsp;&sigma;<sub><em>Y</em></sub>; <code>PEEQ &gt; 0</code>; unloading <em>h<sub>r</sub> &gt; 0</em>; coated stack shows lower <em>p</em><sub>max</sub>, wider <em>a</em>, and higher film bending &sigma;<sub><em>rr</em></sub> than elastic</td>
+        </tr>
+        <tr>
+          <td><strong>T8</strong></td>
+          <td>FEM mesh convergence (<code>coarse</code> vs. <code>standard</code> vs. <code>fine</code>)</td>
+          <td>Change in <em>p</em><sub>max</sub> and <em>a</em> between <code>standard</code> and <code>fine</code> is <strong>&lt; 2%</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Scientific References</h2>
+
+    <ol class="ref-list">
+      <li>
+        <strong>Hertz, H.</strong> (1882). &ldquo;&Uuml;ber die Ber&uuml;hrung fester elastischer K&ouml;rper.&rdquo;
+        <em>Journal f&uuml;r die reine und angewandte Mathematik (Crelle)</em>, 92, 156&ndash;171.
+        (Classical elastic sphere-on-half-space contact theory.)
+      </li>
+      <li>
+        <strong>Burmister, D. M.</strong> (1945). &ldquo;The general theory of stresses and displacements in layered systems I&ndash;III.&rdquo;
+        <em>Journal of Applied Physics</em>, 16, 89&ndash;94, 126&ndash;127, 296&ndash;302.
+        (Axisymmetric Hankel-transform boundary-value solution for multilayer elastic media.)
+      </li>
+      <li>
+        <strong>Tabor, D.</strong> (1951). <em>The Hardness of Metals</em>. Oxford University Press.
+        (Empirical constraint factor <em>H</em> &approx; 2.8&ndash;3.0&thinsp;&sigma;<sub><em>Y</em></sub> and fully plastic indentation plateau.)
+      </li>
+      <li>
+        <strong>Chen, W. T.</strong> (1971). &ldquo;Computation of stresses and displacements in a layered elastic medium.&rdquo;
+        <em>International Journal of Engineering Science</em>, 9(9), 775&ndash;800.
+        (Numerical Hankel quadrature and multilayer elasticity.)
+      </li>
+      <li>
+        <strong>Hamilton, G. M.</strong> (1983). &ldquo;Explicit equations for the stresses beneath a sliding spherical contact.&rdquo;
+        <em>Proceedings of the Institution of Mechanical Engineers, Part C: Journal of Mechanical Engineering Science</em>, 197(1), 53&ndash;59.
+        (Closed-form sliding stress fields and trailing-edge tensile peak validation target for T4.)
+      </li>
+      <li>
+        <strong>Johnson, K. L.</strong> (1985). <em>Contact Mechanics</em>. Cambridge University Press.
+        (Comprehensive reference for Hertzian fields, yield onset at <em>p</em><sub>0</sub> &approx; 1.6&thinsp;&sigma;<sub><em>Y</em></sub>, and tangential traction contact mechanics.)
+      </li>
+      <li>
+        <strong>O'Sullivan, T. C., &amp; King, R. B.</strong> (1988). &ldquo;Sliding contact stress field due to a spherical indenter on a layered elastic half-space.&rdquo;
+        <em>ASME Journal of Tribology</em>, 110(2), 235&ndash;240.
+        (Benchmark trends for layered stiffness ratios <em>E<sub>f</sub> / E<sub>s</sub></em>, coating thicknesses <em>h / a</em>, and sliding interface stress jumps.)
+      </li>
+      <li>
+        <strong>Nogi, T., &amp; Kato, T.</strong> (1997). &ldquo;Influence of a hard surface layer on the limit of elastic contact &mdash; Part I: Analysis using a real surface model.&rdquo;
+        <em>ASME Journal of Tribology</em>, 119(3), 493&ndash;500.
+        (Frequency-domain multilayer Green's functions and interface stress evaluation.)
+      </li>
+      <li>
+        <strong>Polonsky, I. A., &amp; Keer, L. M.</strong> (1999). &ldquo;A numerical method for solving rough contact problems based on the multi-level multi-summation and conjugate gradient techniques.&rdquo;
+        <em>Wear</em>, 231(2), 206&ndash;219.
+        (Active-set Conjugate Gradient complementarity solver used in Engine 1.)
+      </li>
+      <li>
+        <strong>Dhondt, G.</strong> (2004). <em>The Finite Element Method for Three-Dimensional Thermomechanical Applications</em>. Wiley / CalculiX CrunchiX Documentation (<code>ccx</code> v2.23).
+        (Axisymmetric 2&deg; wedge convention, <code>SURFACE TO SURFACE</code> contact, <code>NLGEOM</code>, and J2 <code>*PLASTIC</code> formulation used in Engine 2.)
+      </li>
+    </ol>
+
+    <div class="page-nav">
+      <a href="materials-and-units.html">&larr; Previous: Materials &amp; Units</a>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  APS Technology &mdash; TriboContact Help &amp; Physics Reference
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GUI &amp; CLI Guide &mdash; TriboContact Manual</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="images/logo.png" type="image/png">
+</head>
+<body>
+
+<header class="site-header">
+  <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+  <img src="images/logo.png" alt="APS Technology" class="logo">
+  <div class="title">TriboContact <span>User Manual &amp; Physics Reference</span></div>
+</header>
+
+<aside class="sidebar">
+  <nav>
+    <ul>
+      <li><span class="nav-section">Overview</span></li>
+      <li><a href="index.html">Welcome &amp; Architecture</a></li>
+      <li><a href="getting-started.html" class="active">GUI &amp; CLI Guide</a></li>
+      <li><span class="nav-section">Contact Mechanics Physics</span></li>
+      <li><a href="physics-hertz.html">Classical Hertz Baselines</a></li>
+      <li><a href="physics-elastic-layered.html">Layered Elastic Solver (Engine 1)</a></li>
+      <li><a href="physics-fem-plasticity.html">CalculiX Elastic-Plastic FEM (Engine 2)</a></li>
+      <li><span class="nav-section">Reference</span></li>
+      <li><a href="materials-and-units.html">Materials &amp; Units</a></li>
+      <li><a href="verification-and-references.html">Validation &amp; Literature References</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <div class="content-body">
+
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> <span class="sep">&rsaquo;</span> GUI &amp; CLI Guide
+    </div>
+
+    <h1>GUI &amp; CLI Guide</h1>
+    <p class="page-subtitle">Input setup, background execution, visual diagnostics, command-line automation, and data exports</p>
+
+    <h2>Desktop GUI Panels</h2>
+
+    <h3>Left Input Panel</h3>
+    <ul>
+      <li><strong>Indenter Ball</strong> &mdash; Select a ball preset (such as <code>Si3N4</code>, <code>Al2O3</code>, <code>WC-Co</code>, <code>100Cr6 Steel</code>), enter size in <code>Diameter (mm)</code>, <code>Radius (mm)</code>, or <code>Radius (&mu;m)</code> (live unit conversion when switching), edit <em>E</em> and &nu; inline, or enable <strong>Rigid Ball</strong>.</li>
+      <li><strong>Load &amp; Friction</strong> &mdash; Specify normal load <em>F<sub>N</sub></em> in <code>N</code> or <code>mN</code>, plus friction coefficient &mu; &ge; 0. Setting &mu; &gt; 0 enables the 3D sliding harmonic field in Engine 1.</li>
+      <li><strong>Coating Stack (Top to Bottom)</strong> &mdash; Build 0, 1, or N coating layers using <code>Add...</code>, <code>Edit...</code>, <code>Remove</code>, <code>Up</code>, and <code>Down</code>. Thickness accepts <code>&mu;m</code> or <code>nm</code>; optional <code>&sigma;<sub>y</sub></code>, <code>E<sub>t</sub></code>, and hardness <code>H</code> (with <code>Estimate &sigma;<sub>y</sub> = H / 2.8</code>) enable plasticity and yield-ratio checks.</li>
+      <li><strong>Substrate</strong> &mdash; Choose a substrate preset or enter custom elastic and plastic constants.</li>
+      <li><strong>Solver Settings</strong> &mdash; Choose <code>Both (Elastic + FEM)</code>, <code>Layered Elastic (Engine 1)</code>, or <code>CalculiX FEM (Engine 2)</code>; FEM mesh preset (<code>Coarse</code>, <code>Standard</code>, <code>Fine</code>); element type (<code>CAX4</code> or <code>CAX4I</code>/<code>CAX4R</code>); Engine 1 ring count; and optional FEM unloading step for residual depth <em>h<sub>r</sub></em>.</li>
+    </ul>
+
+    <h3>Right Results Area</h3>
+    <ul>
+      <li><strong>Yield Status Banner</strong> &mdash; Highlights elastic safety vs. yield onset warning (<code>max &sigma;<sub>vM</sub>/&sigma;<sub>y</sub> &gt; 0.95</code> or nonzero <code>PEEQ</code>).</li>
+      <li><strong>Solver Summary Table</strong> &mdash; Compares <code>Hertz Substrate</code>, <code>Hertz Top Film</code>, <code>Layered Elastic</code>, and <code>CalculiX FEM</code> side by side on <em>a</em>, &delta;, <em>h<sub>r</sub></em>, <em>p</em><sub>max</sub>, <em>p</em><sub>mean</sub>, max &sigma;<sub>vM</sub>/&sigma;<sub>y</sub>, and max <code>PEEQ</code>.</li>
+      <li><strong>Interface Discontinuities Table</strong> &mdash; Lists both sides (<em>z<sub>k</sub></em><sup>&minus;</sup> above and <em>z<sub>k</sub></em><sup>+</sup> below) at every film-film and film-substrate boundary without cross-interface averaging.</li>
+      <li><strong>Plot Tabs</strong>:
+        <ol>
+          <li><strong>Contact Pressure p(r)</strong> &mdash; Interactive chart overlaying all active solvers and baselines.</li>
+          <li><strong>2D Stress Heatmap</strong> &mdash; Renders &sigma;<sub>vM</sub>, &sigma;<sub>rr</sub>, &tau;<sub>rz</sub>, <code>PEEQ</code> (FEM), and sliding &sigma;<sub>xx</sub> (<em>y = 0</em> plane for &mu; &gt; 0) with interface dashed lines.</li>
+          <li><strong>Centerline Depth Profile</strong> &mdash; Inverted depth axis plotting &sigma;<sub>vM</sub>(0, <em>z</em>) and &sigma;<sub>rr</sub>(0, <em>z</em>) with sharp step jumps across interfaces.</li>
+          <li><strong>Load Sweep</strong> &mdash; Multi-load parametric sweep plotting <em>p</em><sub>max</sub>, <em>p</em><sub>mean</sub>, <em>a</em>, and max &sigma;<sub>vM</sub>/&sigma;<sub>y</sub> vs. <em>F<sub>N</sub></em>.</li>
+          <li><strong>FEM Mesh Preview</strong> &mdash; Color-coded conforming quad mesh with toggleable zoom into the fine contact zone.</li>
+          <li><strong>Solver Log</strong> &mdash; Live CalculiX console output, bracket iteration load error, and timing.</li>
+        </ol>
+      </li>
+    </ul>
+
+    <div class="callout tip">
+      <div class="callout-title">Keyboard Shortcuts</div>
+      Press <kbd>F5</kbd> to start a simulation solve, click <strong>Cancel</strong> at any time to terminate a running CalculiX job cleanly, and press <kbd>F1</kbd> to open this HTML manual.
+    </div>
+
+    <h2>Built-In Example Cases</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Example File</th>
+          <th>Stack &amp; Indenter</th>
+          <th>Default Conditions</th>
+          <th>Physical Regime</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>examples\tin_on_steel.json</code></td>
+          <td>2 &mu;m TiN on 304 Steel, Si<sub>3</sub>N<sub>4</sub> 6 mm</td>
+          <td>5 N, &mu; = 0</td>
+          <td>Hard brittle film over ductile yielding steel substrate (flexural stress reduction vs. elastic)</td>
+        </tr>
+        <tr>
+          <td><code>examples\dlc_on_glass.json</code></td>
+          <td>1.5 &mu;m DLC on Glass, Si<sub>3</sub>N<sub>4</sub> 6 mm</td>
+          <td>2 N, &mu; = 0.20</td>
+          <td>Sliding coated elastic contact generating trailing-edge surface tensile stress</td>
+        </tr>
+        <tr>
+          <td><code>examples\hard_film_on_polymer.json</code></td>
+          <td>1 &mu;m SiC on PMMA, 100Cr6 6 mm</td>
+          <td>200 mN, &mu; = 0</td>
+          <td>Extreme modulus mismatch (<em>E<sub>f</sub> / E<sub>s</sub></em> &approx; 128) causing strong plate bending on compliant polymer</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Command-Line Interface (<code>TriboContactCLI.exe</code>)</h2>
+
+    <p>All executables (<code>TriboContact.exe</code>, <code>TriboContactCLI.exe</code>, and <code>TriboContactTests.exe</code>) reside in <code>out\bin\</code>:</p>
+
+<pre>out\bin\TriboContactCLI.exe setup-ccx [--url &lt;zip_url&gt;]
+out\bin\TriboContactCLI.exe validate
+out\bin\TriboContactCLI.exe solve examples\tin_on_steel.json --engine both --out-dir my_run --pdf
+out\bin\TriboContactCLI.exe sweep examples\dlc_on_glass.json --loads-mn 500,1000,2000,5000 --engine elastic
+out\bin\TriboContactCLI.exe gui</pre>
+
+    <h3>Exported Files</h3>
+    <ul>
+      <li><code>results.json</code> &mdash; Complete case parameters, summary metrics, pressure curves, centerline arrays, 2D stress grids, and dual-sided interface tables.</li>
+      <li><code>summary.csv</code>, <code>pressure.csv</code>, <code>centerline.csv</code>, <code>interfaces.csv</code> &mdash; Tabular ASCII CSV exports ready for Origin, Excel, or Python post-processing.</li>
+      <li><code>pressure.png</code>, <code>centerline.png</code>, <code>heatmap_*.png</code>, <code>sweep.png</code> (plus optional vector-wrapped <code>.pdf</code> files via <code>--pdf</code> or GUI <code>Export Plots</code>).</li>
+    </ul>
+
+    <div class="page-nav">
+      <a href="index.html">&larr; Previous: Welcome &amp; Architecture</a>
+      <a href="physics-hertz.html" class="next">Next: Classical Hertz Baselines &rarr;</a>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  APS Technology &mdash; TriboContact Help &amp; Physics Reference
+</footer>
+
+</body>
+</html>

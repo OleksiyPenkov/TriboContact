@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Materials &amp; Units &mdash; TriboContact Reference</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="images/logo.png" type="image/png">
+</head>
+<body>
+
+<header class="site-header">
+  <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+  <img src="images/logo.png" alt="APS Technology" class="logo">
+  <div class="title">TriboContact <span>User Manual &amp; Physics Reference</span></div>
+</header>
+
+<aside class="sidebar">
+  <nav>
+    <ul>
+      <li><span class="nav-section">Overview</span></li>
+      <li><a href="index.html">Welcome &amp; Architecture</a></li>
+      <li><a href="getting-started.html">GUI &amp; CLI Guide</a></li>
+      <li><span class="nav-section">Contact Mechanics Physics</span></li>
+      <li><a href="physics-hertz.html">Classical Hertz Baselines</a></li>
+      <li><a href="physics-elastic-layered.html">Layered Elastic Solver (Engine 1)</a></li>
+      <li><a href="physics-fem-plasticity.html">CalculiX Elastic-Plastic FEM (Engine 2)</a></li>
+      <li><span class="nav-section">Reference</span></li>
+      <li><a href="materials-and-units.html" class="active">Materials &amp; Units</a></li>
+      <li><a href="verification-and-references.html">Validation &amp; Literature References</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <div class="content-body">
+
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> <span class="sep">&rsaquo;</span> Materials &amp; Units
+    </div>
+
+    <h1>Materials Library &amp; Unit System</h1>
+    <p class="page-subtitle">Consistent internal solver units, unit conversions, Tabor yield estimation, and all 24 built-in presets</p>
+
+    <h2>Internal Solver Units &amp; Boundary Conversions</h2>
+
+    <div class="equation">
+      <div class="eq-body">
+        Length: <strong>&mu;m</strong> &nbsp;|&nbsp; Stress / Modulus: <strong>GPa</strong> &nbsp;|&nbsp; Force: <strong>mN</strong>
+        &nbsp;&nbsp;&rArr;&nbsp;&nbsp; <strong>1 GPa &middot; &mu;m<sup>2</sup> = 1 mN</strong>
+      </div>
+      <div class="eq-num">(1)</div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Quantity</th>
+          <th>User / Experimental Unit</th>
+          <th>Internal Solver Unit</th>
+          <th>Exact Multiplier</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Ball radius / diameter</td>
+          <td><code>mm</code></td>
+          <td><code>&mu;m</code></td>
+          <td>&times; 1000 (radius = diameter &times; 500)</td>
+        </tr>
+        <tr>
+          <td>Layer thickness</td>
+          <td><code>nm</code></td>
+          <td><code>&mu;m</code></td>
+          <td>&times; 0.001</td>
+        </tr>
+        <tr>
+          <td>Normal load</td>
+          <td><code>N</code></td>
+          <td><code>mN</code></td>
+          <td>&times; 1000</td>
+        </tr>
+        <tr>
+          <td>Modulus, yield stress, hardness</td>
+          <td><code>MPa</code></td>
+          <td><code>GPa</code></td>
+          <td>&times; 0.001</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Hardness-to-Yield Estimation (Tabor Relation)</h2>
+
+    <p>
+      When only indentation hardness <em>H</em> is known for a coating or substrate, clicking
+      <code>Estimate &sigma;<sub>y</sub> = H / 2.8</code> applies the empirical Tabor constraint relation:
+    </p>
+
+    <div class="equation">
+      <div class="eq-body">
+        &sigma;<sub><em>Y</em></sub> &approx; <span class="frac"><span class="num"><em>H</em></span><span class="den"><em>C</em></span></span>,
+        &nbsp;&nbsp;default constraint factor <em>C</em> = 2.8 (elastic-plastic metals &amp; hard coatings &asymp; 2.8&ndash;3.0)
+      </div>
+      <div class="eq-num">(2)</div>
+    </div>
+
+    <h2>Built-In Material Presets (<code>data\materials.json</code>)</h2>
+
+    <p>
+      Custom user presets created in the Layer Editor or <code>Library &gt; Material Presets Manager...</code> are
+      stored locally in <code>data\local\materials_user.json</code> without overwriting the shipped database.
+    </p>
+
+    <h3>Ball Presets (7)</h3>
+    <table>
+      <thead>
+        <tr><th>Name</th><th><em>E</em> (GPa)</th><th>&nu;</th><th>&sigma;<sub><em>Y</em></sub> (GPa)</th><th><em>E<sub>t</sub></em> (GPa)</th><th><em>H</em> (GPa)</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Si3N4</strong></td><td>310</td><td>0.27</td><td>&mdash;</td><td>&mdash;</td><td>16.0</td><td>Hot-pressed silicon nitride bearing ball</td></tr>
+        <tr><td><strong>Al2O3</strong></td><td>380</td><td>0.23</td><td>&mdash;</td><td>&mdash;</td><td>18.0</td><td>Sintered alumina ceramic ball</td></tr>
+        <tr><td><strong>WC-Co</strong></td><td>620</td><td>0.22</td><td>4.5</td><td>&mdash;</td><td>15.0</td><td>Cemented tungsten carbide (6 wt% Co)</td></tr>
+        <tr><td><strong>100Cr6 Steel</strong></td><td>210</td><td>0.30</td><td>2.0</td><td>2.1</td><td>7.5</td><td>Hardened AISI 52100 bearing steel ball</td></tr>
+        <tr><td><strong>Sapphire</strong></td><td>400</td><td>0.25</td><td>&mdash;</td><td>&mdash;</td><td>20.0</td><td>Single-crystal alpha-Al<sub>2</sub>O<sub>3</sub> sphere</td></tr>
+        <tr><td><strong>Diamond</strong></td><td>1140</td><td>0.07</td><td>&mdash;</td><td>&mdash;</td><td>90.0</td><td>Single-crystal diamond indenter</td></tr>
+        <tr><td><strong>SiO2</strong></td><td>72</td><td>0.17</td><td>&mdash;</td><td>&mdash;</td><td>9.0</td><td>Fused silica glass ball</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Coating Presets (9)</h3>
+    <table>
+      <thead>
+        <tr><th>Name</th><th><em>E</em> (GPa)</th><th>&nu;</th><th>&sigma;<sub><em>Y</em></sub> (GPa)</th><th><em>E<sub>t</sub></em> (GPa)</th><th><em>H</em> (GPa)</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>DLC</strong></td><td>180</td><td>0.22</td><td>5.5</td><td>&mdash;</td><td>20.0</td><td>Hydrogenated amorphous diamond-like carbon (a-C:H)</td></tr>
+        <tr><td><strong>TiN</strong></td><td>450</td><td>0.25</td><td>7.5</td><td>&mdash;</td><td>24.0</td><td>PVD titanium nitride hard coating</td></tr>
+        <tr><td><strong>CrN</strong></td><td>320</td><td>0.24</td><td>6.0</td><td>&mdash;</td><td>18.0</td><td>PVD chromium nitride coating</td></tr>
+        <tr><td><strong>TiAlN</strong></td><td>420</td><td>0.24</td><td>8.0</td><td>&mdash;</td><td>28.0</td><td>PVD titanium aluminum nitride coating</td></tr>
+        <tr><td><strong>W/B4C</strong></td><td>350</td><td>0.22</td><td>6.5</td><td>&mdash;</td><td>22.0</td><td>Nanoscale W/B<sub>4</sub>C multilayer coating (effective elastic properties)</td></tr>
+        <tr><td><strong>SiC</strong></td><td>410</td><td>0.17</td><td>7.0</td><td>&mdash;</td><td>26.0</td><td>Amorphous/crystalline silicon carbide coating</td></tr>
+        <tr><td><strong>Al2O3</strong></td><td>360</td><td>0.23</td><td>5.0</td><td>&mdash;</td><td>16.0</td><td>ALD/PVD alumina ceramic film</td></tr>
+        <tr><td><strong>Cu</strong></td><td>120</td><td>0.34</td><td>0.25</td><td>1.2</td><td>1.0</td><td>Electroplated/sputtered copper film</td></tr>
+        <tr><td><strong>Ru</strong></td><td>430</td><td>0.29</td><td>1.5</td><td>&mdash;</td><td>4.5</td><td>Sputtered ruthenium capping layer</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Substrate Presets (8)</h3>
+    <table>
+      <thead>
+        <tr><th>Name</th><th><em>E</em> (GPa)</th><th>&nu;</th><th>&sigma;<sub><em>Y</em></sub> (GPa)</th><th><em>E<sub>t</sub></em> (GPa)</th><th><em>H</em> (GPa)</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Si(100)</strong></td><td>165</td><td>0.22</td><td>4.0</td><td>&mdash;</td><td>12.0</td><td>Single-crystal silicon wafer (effective isotropic modulus)</td></tr>
+        <tr><td><strong>Glass</strong></td><td>72</td><td>0.22</td><td>1.5</td><td>&mdash;</td><td>6.0</td><td>Soda-lime / borosilicate glass substrate</td></tr>
+        <tr><td><strong>304 Steel</strong></td><td>193</td><td>0.29</td><td>0.29</td><td>2.0</td><td>2.0</td><td>Annealed AISI 304 austenitic stainless steel</td></tr>
+        <tr><td><strong>Ti-6Al-4V</strong></td><td>114</td><td>0.34</td><td>0.88</td><td>1.5</td><td>3.4</td><td>Grade 5 titanium alloy</td></tr>
+        <tr><td><strong>Al 6061-T6</strong></td><td>69</td><td>0.33</td><td>0.276</td><td>0.7</td><td>1.05</td><td>Precipitation-hardened aluminum alloy</td></tr>
+        <tr><td><strong>Cu</strong></td><td>120</td><td>0.34</td><td>0.18</td><td>1.2</td><td>0.8</td><td>Oxygen-free high-conductivity copper</td></tr>
+        <tr><td><strong>PMMA</strong></td><td>3.2</td><td>0.37</td><td>0.07</td><td>0.1</td><td>0.22</td><td>Polymethyl methacrylate polymer</td></tr>
+        <tr><td><strong>PEEK</strong></td><td>3.8</td><td>0.38</td><td>0.10</td><td>0.15</td><td>0.28</td><td>Polyether ether ketone engineering polymer</td></tr>
+      </tbody>
+    </table>
+
+    <div class="page-nav">
+      <a href="physics-fem-plasticity.html">&larr; Previous: CalculiX Elastic-Plastic FEM</a>
+      <a href="verification-and-references.html" class="next">Next: Validation &amp; References &rarr;</a>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  APS Technology &mdash; TriboContact Help &amp; Physics Reference
+</footer>
+
+</body>
+</html>

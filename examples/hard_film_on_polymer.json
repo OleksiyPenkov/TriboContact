@@ -1,0 +1,52 @@
+{
+  "case_name": "SiC 1um on PMMA (100Cr6 6mm, 200mN)",
+  "ball": {
+    "radius_um": 3000.0,
+    "material": {
+      "name": "100Cr6 Steel",
+      "E_gpa": 210.0,
+      "nu": 0.30,
+      "sigma_y_gpa": 2.0,
+      "E_t_gpa": 2.1,
+      "hardness_gpa": 7.5,
+      "category": "ball"
+    },
+    "rigid": false
+  },
+  "layers": [
+    {
+      "material": {
+        "name": "SiC",
+        "E_gpa": 410.0,
+        "nu": 0.17,
+        "sigma_y_gpa": 7.0,
+        "hardness_gpa": 26.0,
+        "category": "coating"
+      },
+      "thickness_um": 1.0
+    }
+  ],
+  "substrate": {
+    "name": "PMMA",
+    "E_gpa": 3.2,
+    "nu": 0.37,
+    "sigma_y_gpa": 0.07,
+    "E_t_gpa": 0.1,
+    "hardness_gpa": 0.22,
+    "category": "substrate"
+  },
+  "load_case": {
+    "normal_load_mn": 200.0,
+    "friction_coeff": 0.0
+  },
+  "solver": {
+    "engine": "both",
+    "n_rings": 160,
+    "mesh_density": "standard",
+    "element_type": "CAX4",
+    "include_unloading": false,
+    "max_load_brackets": 3,
+    "load_tolerance_rel": 0.01,
+    "timeout_s": 300
+  }
+}

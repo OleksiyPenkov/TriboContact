@@ -1,0 +1,223 @@
+{
+  "materials": [
+    {
+      "name": "Si3N4",
+      "category": "ball",
+      "E_gpa": 310.0,
+      "nu": 0.27,
+      "hardness_gpa": 16.0,
+      "notes": "Hot-pressed silicon nitride bearing ball"
+    },
+    {
+      "name": "Al2O3",
+      "category": "ball",
+      "E_gpa": 380.0,
+      "nu": 0.23,
+      "hardness_gpa": 18.0,
+      "notes": "Sintered alumina ceramic ball"
+    },
+    {
+      "name": "WC-Co",
+      "category": "ball",
+      "E_gpa": 620.0,
+      "nu": 0.22,
+      "sigma_y_gpa": 4.5,
+      "hardness_gpa": 15.0,
+      "notes": "Cemented tungsten carbide (6 wt% Co)"
+    },
+    {
+      "name": "100Cr6 Steel",
+      "category": "ball",
+      "E_gpa": 210.0,
+      "nu": 0.30,
+      "sigma_y_gpa": 2.0,
+      "E_t_gpa": 2.1,
+      "hardness_gpa": 7.5,
+      "notes": "Hardened AISI 52100 bearing steel ball"
+    },
+    {
+      "name": "Sapphire",
+      "category": "ball",
+      "E_gpa": 400.0,
+      "nu": 0.25,
+      "hardness_gpa": 20.0,
+      "notes": "Single-crystal alpha-Al2O3 sphere"
+    },
+    {
+      "name": "Diamond",
+      "category": "ball",
+      "E_gpa": 1140.0,
+      "nu": 0.07,
+      "hardness_gpa": 90.0,
+      "notes": "Single-crystal diamond indenter"
+    },
+    {
+      "name": "SiO2",
+      "category": "ball",
+      "E_gpa": 72.0,
+      "nu": 0.17,
+      "hardness_gpa": 9.0,
+      "notes": "Fused silica glass ball"
+    },
+    {
+      "name": "DLC",
+      "category": "coating",
+      "E_gpa": 180.0,
+      "nu": 0.22,
+      "sigma_y_gpa": 5.5,
+      "hardness_gpa": 20.0,
+      "notes": "Hydrogenated amorphous diamond-like carbon (a-C:H)"
+    },
+    {
+      "name": "TiN",
+      "category": "coating",
+      "E_gpa": 450.0,
+      "nu": 0.25,
+      "sigma_y_gpa": 7.5,
+      "hardness_gpa": 24.0,
+      "notes": "PVD titanium nitride hard coating"
+    },
+    {
+      "name": "CrN",
+      "category": "coating",
+      "E_gpa": 320.0,
+      "nu": 0.24,
+      "sigma_y_gpa": 6.0,
+      "hardness_gpa": 18.0,
+      "notes": "PVD chromium nitride coating"
+    },
+    {
+      "name": "TiAlN",
+      "category": "coating",
+      "E_gpa": 420.0,
+      "nu": 0.24,
+      "sigma_y_gpa": 8.0,
+      "hardness_gpa": 28.0,
+      "notes": "PVD titanium aluminum nitride coating"
+    },
+    {
+      "name": "W/B4C",
+      "category": "coating",
+      "E_gpa": 350.0,
+      "nu": 0.22,
+      "sigma_y_gpa": 6.5,
+      "hardness_gpa": 22.0,
+      "notes": "Nanoscale W/B4C multilayer coating (effective elastic properties)"
+    },
+    {
+      "name": "SiC",
+      "category": "coating",
+      "E_gpa": 410.0,
+      "nu": 0.17,
+      "sigma_y_gpa": 7.0,
+      "hardness_gpa": 26.0,
+      "notes": "Amorphous/crystalline silicon carbide coating"
+    },
+    {
+      "name": "Al2O3",
+      "category": "coating",
+      "E_gpa": 360.0,
+      "nu": 0.23,
+      "sigma_y_gpa": 5.0,
+      "hardness_gpa": 16.0,
+      "notes": "ALD/PVD alumina ceramic film"
+    },
+    {
+      "name": "Cu",
+      "category": "coating",
+      "E_gpa": 120.0,
+      "nu": 0.34,
+      "sigma_y_gpa": 0.25,
+      "E_t_gpa": 1.2,
+      "hardness_gpa": 1.0,
+      "notes": "Electroplated/sputtered copper film"
+    },
+    {
+      "name": "Ru",
+      "category": "coating",
+      "E_gpa": 430.0,
+      "nu": 0.29,
+      "sigma_y_gpa": 1.5,
+      "hardness_gpa": 4.5,
+      "notes": "Sputtered ruthenium capping layer"
+    },
+    {
+      "name": "Si(100)",
+      "category": "substrate",
+      "E_gpa": 165.0,
+      "nu": 0.22,
+      "sigma_y_gpa": 4.0,
+      "hardness_gpa": 12.0,
+      "notes": "Single-crystal silicon wafer (effective isotropic modulus)"
+    },
+    {
+      "name": "Glass",
+      "category": "substrate",
+      "E_gpa": 72.0,
+      "nu": 0.22,
+      "sigma_y_gpa": 1.5,
+      "hardness_gpa": 6.0,
+      "notes": "Soda-lime / borosilicate glass substrate"
+    },
+    {
+      "name": "304 Steel",
+      "category": "substrate",
+      "E_gpa": 193.0,
+      "nu": 0.29,
+      "sigma_y_gpa": 0.29,
+      "E_t_gpa": 2.0,
+      "hardness_gpa": 2.0,
+      "notes": "Annealed AISI 304 austenitic stainless steel"
+    },
+    {
+      "name": "Ti-6Al-4V",
+      "category": "substrate",
+      "E_gpa": 114.0,
+      "nu": 0.34,
+      "sigma_y_gpa": 0.88,
+      "E_t_gpa": 1.5,
+      "hardness_gpa": 3.4,
+      "notes": "Grade 5 titanium alloy"
+    },
+    {
+      "name": "Al 6061-T6",
+      "category": "substrate",
+      "E_gpa": 69.0,
+      "nu": 0.33,
+      "sigma_y_gpa": 0.276,
+      "E_t_gpa": 0.7,
+      "hardness_gpa": 1.05,
+      "notes": "Precipitation-hardened aluminum alloy"
+    },
+    {
+      "name": "Cu",
+      "category": "substrate",
+      "E_gpa": 120.0,
+      "nu": 0.34,
+      "sigma_y_gpa": 0.18,
+      "E_t_gpa": 1.2,
+      "hardness_gpa": 0.8,
+      "notes": "Oxygen-free high-conductivity copper"
+    },
+    {
+      "name": "PMMA",
+      "category": "substrate",
+      "E_gpa": 3.2,
+      "nu": 0.37,
+      "sigma_y_gpa": 0.07,
+      "E_t_gpa": 0.1,
+      "hardness_gpa": 0.22,
+      "notes": "Polymethyl methacrylate polymer"
+    },
+    {
+      "name": "PEEK",
+      "category": "substrate",
+      "E_gpa": 3.8,
+      "nu": 0.38,
+      "sigma_y_gpa": 0.10,
+      "E_t_gpa": 0.15,
+      "hardness_gpa": 0.28,
+      "notes": "Polyether ether ketone engineering polymer"
+    }
+  ]
+}

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CalculiX Elastic-Plastic FEM (Engine 2) &mdash; TriboContact Physics</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="images/logo.png" type="image/png">
+</head>
+<body>
+
+<header class="site-header">
+  <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+  <img src="images/logo.png" alt="APS Technology" class="logo">
+  <div class="title">TriboContact <span>User Manual &amp; Physics Reference</span></div>
+</header>
+
+<aside class="sidebar">
+  <nav>
+    <ul>
+      <li><span class="nav-section">Overview</span></li>
+      <li><a href="index.html">Welcome &amp; Architecture</a></li>
+      <li><a href="getting-started.html">GUI &amp; CLI Guide</a></li>
+      <li><span class="nav-section">Contact Mechanics Physics</span></li>
+      <li><a href="physics-hertz.html">Classical Hertz Baselines</a></li>
+      <li><a href="physics-elastic-layered.html">Layered Elastic Solver (Engine 1)</a></li>
+      <li><a href="physics-fem-plasticity.html" class="active">CalculiX Elastic-Plastic FEM (Engine 2)</a></li>
+      <li><span class="nav-section">Reference</span></li>
+      <li><a href="materials-and-units.html">Materials &amp; Units</a></li>
+      <li><a href="verification-and-references.html">Validation &amp; Literature References</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <div class="content-body">
+
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> <span class="sep">&rsaquo;</span> CalculiX Elastic-Plastic FEM (Engine 2)
+    </div>
+
+    <h1>Automated CalculiX Axisymmetric FEM (Engine 2)</h1>
+    <p class="page-subtitle">Graded conforming mesh generation, 2&deg; axisymmetric wedge scaling, penalty contact, secant load matching, and J2 plasticity</p>
+
+    <h2>1. Why Elastic-Plastic FEM Matters for Coated Tribotests</h2>
+
+    <p>
+      Under realistic laboratory loads, ductile metallic or polymeric substrates yield beneath thin ceramic
+      coatings. Once plastic flow begins, classical and layered linear-elastic models significantly
+      <strong>overpredict peak pressure <em>p</em><sub>max</sub></strong> and <strong>underpredict contact radius <em>a</em></strong>:
+      plastic flow flattens the substrate support, spreads load over a larger area, lets hard coatings flex
+      downward (increasing tensile/compressive bending stress &sigma;<sub><em>rr</em></sub> inside the film), and
+      leaves a permanent impression depth <em>h<sub>r</sub></em> &gt; 0 upon unloading.
+    </p>
+
+    <figure class="diagram">
+      <svg width="700" height="275" viewBox="0 0 700 275" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr-fem" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+            <path d="M0,1 L7,4 L0,7 Z" fill="#1a3064"/>
+          </marker>
+        </defs>
+        <line x1="65" y1="20" x2="65" y2="250" stroke="#1a3064" stroke-width="1.6" stroke-dasharray="6 4"/>
+        <text x="20" y="34" font-family="Segoe UI, sans-serif" font-size="12" font-weight="600" fill="#1a3064">X = 0</text>
+        <text x="16" y="49" font-family="Segoe UI, sans-serif" font-size="11" fill="#666">(Ux = 0)</text>
+        <path d="M 65 44 L 185 44 L 185 95 Q 130 132 65 135 Z" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2"/>
+        <line x1="65" y1="36" x2="185" y2="36" stroke="#c62828" stroke-width="2.5"/>
+        <text x="90" y="29" font-family="Segoe UI, sans-serif" font-size="12" font-weight="600" fill="#c62828">BALL_TOP: Uy = -&delta;</text>
+        <text x="92" y="88" font-family="Segoe UI, sans-serif" font-size="12" fill="#1e3a8a">CAX4 Graded Ball</text>
+        <rect x="65" y="138" width="290" height="26" fill="#cffafe" stroke="#0e7490" stroke-width="1.8"/>
+        <rect x="65" y="164" width="290" height="72" fill="#f1f5f9" stroke="#334155" stroke-width="1.8"/>
+        <line x1="95" y1="138" x2="95" y2="236" stroke="#94a3b8" stroke-width="0.9"/>
+        <line x1="125" y1="138" x2="125" y2="236" stroke="#94a3b8" stroke-width="0.9"/>
+        <line x1="160" y1="138" x2="160" y2="236" stroke="#94a3b8" stroke-width="0.9"/>
+        <line x1="210" y1="138" x2="210" y2="236" stroke="#94a3b8" stroke-width="0.9"/>
+        <line x1="275" y1="138" x2="275" y2="236" stroke="#94a3b8" stroke-width="0.9"/>
+        <text x="74" y="155" font-family="Segoe UI, sans-serif" font-size="11.5" fill="#0e7490">Fine Contact Zone (Conforming Layers)</text>
+        <text x="74" y="205" font-family="Segoe UI, sans-serif" font-size="12" fill="#334155">Graded Substrate (H_sub &ge; 20 a, R_dom &ge; 20 a)</text>
+        <line x1="65" y1="236" x2="355" y2="236" stroke="#334155" stroke-width="3"/>
+        <text x="150" y="254" font-family="Segoe UI, sans-serif" font-size="12" fill="#334155">SPEC_BOTTOM: Uy = 0</text>
+        <g transform="translate(430, 35)">
+          <text x="0" y="0" font-family="Segoe UI, sans-serif" font-size="14" font-weight="600" fill="#1a3064">CalculiX 2&deg; Wedge Convention</text>
+          <path d="M 30 140 L 195 95 A 170 170 0 0 1 205 140 Z" fill="#e0f2fe" stroke="#0369a1" stroke-width="2"/>
+          <path d="M 145 109 A 120 120 0 0 1 150 140" fill="none" stroke="#c62828" stroke-width="2"/>
+          <text x="155" y="128" font-family="Segoe UI, sans-serif" font-size="13" font-weight="600" fill="#c62828">2&deg; (&pi;/90 rad)</text>
+          <text x="0" y="182" font-family="Segoe UI, sans-serif" font-size="13" fill="#333">F_N,360&deg; = 180 &times; |&Sigma; RF_2|</text>
+          <text x="0" y="204" font-family="Segoe UI, sans-serif" font-size="12.5" fill="#555">Contact integral checked on deformed radii:</text>
+          <text x="0" y="222" font-family="Segoe UI, sans-serif" font-size="12.5" fill="#1a3064">|2&pi; &int; r_def p(r) dr &minus; F_N| / F_N &lt; 0.03</text>
+        </g>
+      </svg>
+      <figcaption>Figure 3 &mdash; Graded conforming quadrilateral axisymmetric mesh in the global X&ndash;Y plane (X = r, Y = z) and CalculiX 2&deg; wedge force scaling.</figcaption>
+    </figure>
+
+    <h2>2. Parametric Graded Conforming Mesh</h2>
+
+    <p>
+      TriboContact generates structured 4-node axisymmetric quadrilateral meshes directly in Delphi
+      (<code>TriboContact.FemMesh.pas</code>) without any external mesher dependency:
+    </p>
+
+    <ul>
+      <li><strong>Domain Extents</strong> &mdash; Automatically sized from Engine 1 contact radius <em>a</em><sub>est</sub> and yield ratio: <em>a</em><sub>eff</sub> = <em>a</em><sub>est</sub> max(1, 0.58&thinsp;&radic;<em>r<sub>y</sub></em>) when plasticity is active; far-field boundaries satisfy <em>R</em><sub>dom</sub> &ge; max(20&thinsp;<em>a</em><sub>eff</sub>, 20&thinsp;<em>h</em><sub>total</sub>) and <em>H</em><sub>sub</sub> &ge; max(20&thinsp;<em>a</em><sub>eff</sub>, 20&thinsp;<em>h</em><sub>total</sub>).</li>
+      <li><strong>Density Presets</strong> &mdash; Radial elements across <em>a</em><sub>eff</sub>: <strong>15</strong> (<code>coarse</code>), <strong>24</strong> (<code>standard</code>), <strong>36</strong> (<code>fine</code>), with geometric grading toward the far field and symmetric interface refinement through every coating layer.</li>
+      <li><strong>Deformable / Rigid Ball</strong> &mdash; Generates a graded quarter-sphere ball mesh (<code>0.75 &Delta;r<sub>fine</sub></code> rigid, <code>1.0 &Delta;r<sub>fine</sub></code> deformable), enforcing positive quad Jacobians, counter-clockwise orientation, zero duplicate nodes, and exact interface node sharing.</li>
+    </ul>
+
+    <h2>3. CalculiX Axisymmetric Deck &amp; Numerical Formulation</h2>
+
+    <ul>
+      <li><strong>2&deg; Wedge Convention</strong> &mdash; CalculiX treats 2D axisymmetric elements as a 2&deg; sector. Therefore total 360&deg; normal force from nodal vertical reactions is:</li>
+    </ul>
+
+    <div class="equation">
+      <div class="eq-body">
+        <em>F</em><sub><em>N</em>,360&deg;</sub> = 180 &times; | &Sigma;<sub>BALL_TOP</sub> RF<sub>2</sub> |
+      </div>
+      <div class="eq-num">(1)</div>
+    </div>
+
+    <ul>
+      <li><strong>Elements &amp; Symmetry Axis Safeguard</strong> &mdash; Uses linear 4-node <code>CAX4</code> quads (<code>CAX4I</code> maps cleanly to <code>CAX4</code> on CalculiX 2.23, avoiding incompatible-mode element limitations on <code>SURFACE TO SURFACE</code>). Axis nodes at exact <em>r</em> = 0 are emitted as <em>r</em> = 10<sup>&minus;3</sup>&thinsp;&Delta;<em>r</em><sub>min</sub> with <code>Ux = 0</code> so CalculiX does not drop the innermost contact segment at <em>r</em> = 0.</li>
+      <li><strong>Penalty Contact &amp; Geometric Nonlinearity</strong> &mdash; Uses <code>*CONTACT PAIR, TYPE=SURFACE TO SURFACE</code> (slave <code>S3</code> top face, master <code>S1</code> ball arc), <code>*STEP, NLGEOM</code>, and auto-scaled linear penalty stiffness <em>K<sub>p</sub></em> capped against sphere facet sagitta <em>s</em> = &Delta;<em>r</em><sup>2</sup> / (8<em>R</em>).</li>
+      <li><strong>Displacement Control &amp; Secant Load Matching</strong> &mdash; Ramps prescribed downward displacement &minus;&delta; on <code>BALL_TOP</code> (never force-controlled from <em>F</em> = 0) and converges |<em>F</em><sub><em>N</em>,360&deg;</sub> &minus; <em>F</em><sub>target</sub>| / <em>F</em><sub>target</sub> &le; 1% in at most 3 secant brackets.</li>
+      <li><strong>Pressure-Integral Force Balance</strong> &mdash; Every converged solve integrates nodal contact pressure over deformed radial coordinates <em>r</em><sub>def</sub> = <em>R</em> + <em>U<sub>r</sub></em> and verifies force balance within &lt; 3%.</li>
+    </ul>
+
+    <h2>4. J2 Plasticity, Hardening, and Unloading</h2>
+
+    <p>
+      When yield stress &sigma;<sub><em>Y</em></sub> is defined for a layer or substrate, Engine 2 emits a von Mises J2
+      isotropic hardening card (<code>*PLASTIC</code>). Tabular true-stress vs. plastic-strain curves are written
+      directly; bilinear inputs using tangent modulus <em>E<sub>t</sub></em> are converted to plastic hardening modulus <em>H'</em>:
+    </p>
+
+    <div class="equation">
+      <div class="eq-body">
+        <em>H'</em> = <span class="frac"><span class="num"><em>E &middot; E<sub>t</sub></em></span><span class="den"><em>E &minus; E<sub>t</sub></em></span></span>,
+        &nbsp;&nbsp;&sigma;(0) = &sigma;<sub><em>Y</em></sub>,
+        &nbsp;&nbsp;&sigma;(0.1) = &sigma;<sub><em>Y</em></sub> + 0.1&thinsp;<em>H'</em>
+      </div>
+      <div class="eq-num">(2)</div>
+    </div>
+
+    <p>
+      For deep elastic-plastic indentation of an elastic-perfectly-plastic half-space (small <em>E<sub>t</sub></em>),
+      mean contact pressure approaches the classic <strong>Tabor constraint plateau</strong>
+      <em>p</em><sub>mean</sub> &approx; 2.8&ndash;3.0&thinsp;&sigma;<sub><em>Y</em></sub>, accompanied by positive
+      equivalent plastic strain (<code>PEEQ &gt; 0</code>) and permanent residual depth <em>h<sub>r</sub></em> &gt; 0
+      when the optional unloading step is enabled.
+    </p>
+
+    <h3>Per-Region Stress Recovery</h3>
+    <p>
+      CalculiX nodal averages in <code>.frd</code> smear stresses across shared interface nodes between stiff and
+      compliant materials. Engine 2 builds per-region element connectivity graphs and extrapolates/projects stresses
+      within each material domain independently so <em>z<sub>k</sub></em><sup>&minus;</sup> and <em>z<sub>k</sub></em><sup>+</sup>
+      interface jumps remain sharp and uncorrupted.
+    </p>
+
+    <div class="callout warning">
+      <div class="callout-title">Axisymmetric Limitation</div>
+      Engine 2 models axisymmetric normal indentation and unloading (<code>&mu; = 0</code> in the 2D axisymmetric
+      FEM mesh; sliding friction tangential tractions are modeled by Engine 1's 3D harmonic elastic solver).
+    </div>
+
+    <div class="page-nav">
+      <a href="physics-elastic-layered.html">&larr; Previous: Layered Elastic Solver (Engine 1)</a>
+      <a href="materials-and-units.html" class="next">Next: Materials &amp; Units &rarr;</a>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  APS Technology &mdash; TriboContact Help &amp; Physics Reference
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Layered Elastic Solver (Engine 1) &mdash; TriboContact Physics</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="images/logo.png" type="image/png">
+</head>
+<body>
+
+<header class="site-header">
+  <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+  <img src="images/logo.png" alt="APS Technology" class="logo">
+  <div class="title">TriboContact <span>User Manual &amp; Physics Reference</span></div>
+</header>
+
+<aside class="sidebar">
+  <nav>
+    <ul>
+      <li><span class="nav-section">Overview</span></li>
+      <li><a href="index.html">Welcome &amp; Architecture</a></li>
+      <li><a href="getting-started.html">GUI &amp; CLI Guide</a></li>
+      <li><span class="nav-section">Contact Mechanics Physics</span></li>
+      <li><a href="physics-hertz.html">Classical Hertz Baselines</a></li>
+      <li><a href="physics-elastic-layered.html" class="active">Layered Elastic Solver (Engine 1)</a></li>
+      <li><a href="physics-fem-plasticity.html">CalculiX Elastic-Plastic FEM (Engine 2)</a></li>
+      <li><span class="nav-section">Reference</span></li>
+      <li><a href="materials-and-units.html">Materials &amp; Units</a></li>
+      <li><a href="verification-and-references.html">Validation &amp; Literature References</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <div class="content-body">
+
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> <span class="sep">&rsaquo;</span> Layered Elastic Solver (Engine 1)
+    </div>
+
+    <h1>Semi-Analytical Layered Elastic Solver (Engine 1)</h1>
+    <p class="page-subtitle">Hankel Stiffness Matrix Method (SMM), asymptotic subtraction, Polonsky-Keer CG, interface discontinuities, and 3D sliding friction</p>
+
+    <h2>1. N-Layer Elastic Stack Model</h2>
+
+    <p>
+      Engine 1 models an arbitrary stack of <em>N</em> isotropic linear-elastic layers (thickness <em>h<sub>k</sub></em>,
+      Young's modulus <em>E<sub>k</sub></em>, Poisson's ratio &nu;<sub><em>k</em></sub> for <em>k</em> = 1, &hellip;, <em>N</em>)
+      perfectly bonded to a semi-infinite substrate (<em>E<sub>s</sub>, &nu;<sub>s</sub></em>). Every interface
+      <em>z = z<sub>k</sub></em> enforces strict traction and displacement continuity:
+    </p>
+
+    <div class="equation">
+      <div class="eq-body">
+        <em>u<sub>r</sub></em>(<em>z<sub>k</sub></em><sup>&minus;</sup>) = <em>u<sub>r</sub></em>(<em>z<sub>k</sub></em><sup>+</sup>),
+        &nbsp;&nbsp;<em>u<sub>z</sub></em>(<em>z<sub>k</sub></em><sup>&minus;</sup>) = <em>u<sub>z</sub></em>(<em>z<sub>k</sub></em><sup>+</sup>),
+        &nbsp;&nbsp;&sigma;<sub><em>zz</em></sub>(<em>z<sub>k</sub></em><sup>&minus;</sup>) = &sigma;<sub><em>zz</em></sub>(<em>z<sub>k</sub></em><sup>+</sup>),
+        &nbsp;&nbsp;&tau;<sub><em>rz</em></sub>(<em>z<sub>k</sub></em><sup>&minus;</sup>) = &tau;<sub><em>rz</em></sub>(<em>z<sub>k</sub></em><sup>+</sup>)
+      </div>
+      <div class="eq-num">(1)</div>
+    </div>
+
+    <p>
+      In contrast, the in-plane stresses <strong>&sigma;<sub><em>rr</em></sub></strong>,
+      <strong>&sigma;<sub>&theta;&theta;</sub></strong>, and <strong>&sigma;<sub>vM</sub></strong>
+      are <strong>discontinuous</strong> across every interface whenever moduli or Poisson's ratios differ
+      between adjacent materials.
+    </p>
+
+    <figure class="diagram">
+      <svg width="700" height="270" viewBox="0 0 700 270" xmlns="http://www.w3.org/2000/svg">
+        <rect x="40" y="75" width="330" height="42" fill="#e1f5fe" stroke="#00838f" stroke-width="1.8"/>
+        <rect x="40" y="117" width="330" height="36" fill="#e8eaf6" stroke="#283593" stroke-width="1.8"/>
+        <rect x="40" y="153" width="330" height="86" fill="#eceff1" stroke="#455a64" stroke-width="1.8"/>
+        <path d="M 145 18 A 72 72 0 0 0 265 18" fill="none" stroke="#1a3064" stroke-width="2.4"/>
+        <line x1="205" y1="6" x2="205" y2="54" stroke="#1a3064" stroke-width="2"/>
+        <polygon points="200,50 205,60 210,50" fill="#1a3064"/>
+        <line x1="205" y1="75" x2="295" y2="75" stroke="#c62828" stroke-width="2"/>
+        <text x="298" y="71" font-family="Segoe UI, sans-serif" font-size="12" fill="#c62828">q(r) = &mu; p(r) along +x</text>
+        <circle cx="155" cy="75" r="4" fill="#d32f2f"/>
+        <text x="52" y="65" font-family="Segoe UI, sans-serif" font-size="12" font-weight="600" fill="#c62828">Trailing peak &sigma;_xx(-a, 0)</text>
+        <text x="50" y="100" font-family="Segoe UI, sans-serif" font-size="13" fill="#006064">Layer 1: h_1, E_1, &nu;_1</text>
+        <text x="50" y="139" font-family="Segoe UI, sans-serif" font-size="13" fill="#283593">Layer 2: h_2, E_2, &nu;_2</text>
+        <text x="50" y="200" font-family="Segoe UI, sans-serif" font-size="13" fill="#37474f">Substrate (z &rarr; &infin;): E_s, &nu;_s</text>
+        <text x="380" y="121" font-family="Segoe UI, sans-serif" font-size="12" font-weight="600" fill="#1a3064">z_1^- vs z_1^+ evaluated</text>
+        <text x="415" y="40" font-family="Segoe UI, sans-serif" font-size="14" font-weight="600" fill="#1a3064">Interface Step Jump (&sigma;_rr)</text>
+        <line x1="425" y1="58" x2="645" y2="58" stroke="#1a3064" stroke-width="1.4"/>
+        <line x1="535" y1="58" x2="535" y2="236" stroke="#1a3064" stroke-width="1.4"/>
+        <polyline points="455,58 475,88 505,117" fill="none" stroke="#00838f" stroke-width="2.5"/>
+        <line x1="505" y1="117" x2="565" y2="117" stroke="#c62828" stroke-width="2" stroke-dasharray="4 3"/>
+        <polyline points="565,117 550,136 544,153 538,225" fill="none" stroke="#c62828" stroke-width="2.5"/>
+        <text x="435" y="110" font-family="Segoe UI, sans-serif" font-size="12" fill="#00838f">&sigma;_rr(z_1^-)</text>
+        <text x="572" y="122" font-family="Segoe UI, sans-serif" font-size="12" fill="#c62828">&sigma;_rr(z_1^+)</text>
+        <text x="542" y="232" font-family="Segoe UI, sans-serif" font-size="12" fill="#666">Depth z</text>
+      </svg>
+      <figcaption>Figure 2 &mdash; Layered elastic stack geometry, dual-sided interface stress jump &sigma;<sub>rr</sub>(z<sub>1</sub><sup>&minus;</sup>) &ne; &sigma;<sub>rr</sub>(z<sub>1</sub><sup>+</sup>), and sliding trailing-edge tensile peak at x = &minus;a.</figcaption>
+    </figure>
+
+    <h2>2. Stiffness Matrix Method (SMM) &mdash; Overflow-Free Hankel Formulation</h2>
+
+    <p>
+      Applying the axisymmetric Hankel transform of order 0 (for normal stress/displacement) and order 1
+      (for radial components) with radial wavenumber &xi; reduces the Navier equations in each layer <em>k</em>
+      to a 2&times;2 block stiffness relation relating interfacial displacements (<em>U<sub>k</sub></em>, <em>W<sub>k</sub></em>)
+      to interfacial tractions.
+    </p>
+
+    <div class="callout info">
+      <div class="callout-title">Why SMM Instead of the Transfer Matrix Method</div>
+      The classical Thomson-Haskell Transfer Matrix Method contains growing exponentials
+      exp(+&xi;<em>h<sub>k</sub></em>), which overflow double precision at high wavenumbers or thick stacks.
+      TriboContact uses the <strong>Stiffness Matrix Method (SMM)</strong> formulated strictly with bounded
+      decaying exponentials <em>E<sub>k</sub></em> = exp(&minus;&xi;<em>h<sub>k</sub></em>) &isin; (0, 1], with a
+      fourth-order Taylor expansion of the denominator for thin layers (&xi;<em>h<sub>k</sub></em> &lt; 10<sup>&minus;3</sup>)
+      to eliminate catastrophic cancellation.
+    </div>
+
+    <p>Recursively assembling each layer upward from the substrate half-space stiffness <strong>K</strong><sub>sub</sub> yields the exact surface compliance matrix <strong>G</strong><sup>coated</sup>(&xi;) relating surface tractions (<em>q</em>(&xi;), <em>p</em>(&xi;)) to surface displacements:</p>
+
+    <div class="equation">
+      <div class="eq-body">
+        <strong>K</strong><sub>below</sub><sup>(<em>k</em>&minus;1)</sup> = <strong>K</strong><sub>11</sub><sup>(<em>k</em>)</sup>
+        &minus; <strong>K</strong><sub>12</sub><sup>(<em>k</em>)</sup>
+        (<strong>K</strong><sub>22</sub><sup>(<em>k</em>)</sup> + <strong>K</strong><sub>below</sub><sup>(<em>k</em>)</sup>)<sup>&minus;1</sup>
+        <strong>K</strong><sub>21</sub><sup>(<em>k</em>)</sup>,
+        &nbsp;&nbsp;<strong>G</strong><sup>coated</sup>(&xi;) = (<strong>K</strong><sub>below</sub><sup>(0)</sup>)<sup>&minus;1</sup>
+      </div>
+      <div class="eq-num">(2)</div>
+    </div>
+
+    <h2>3. Asymptotic Splitting &amp; Concentric-Ring Influence Matrix</h2>
+
+    <p>
+      For large wavenumbers &xi;<em>h</em><sub>1</sub> &rarr; &infin;, the coated normal compliance approaches the
+      top-layer homogeneous half-space compliance <em>G<sub>zz</sub></em><sup>top</sup>(&xi;) =
+      2(1 &minus; &nu;<sub>1</sub><sup>2</sup>) / (<em>E</em><sub>1</sub>&xi;). Because <em>G<sub>zz</sub></em><sup>top</sup>(&xi;)
+      decays slowly as 1/&xi;, direct numerical Hankel quadrature converges poorly. Engine 1 therefore splits
+      the Green's function analytically:
+    </p>
+
+    <div class="equation">
+      <div class="eq-body">
+        <em>G<sub>zz</sub></em><sup>coated</sup>(&xi;) =
+        <u><em>G<sub>zz</sub></em><sup>top</sup>(&xi;)</u><sub>analytical ring kernel</sub>
+        + <u>&Delta;<em>G<sub>zz</sub></em>(&xi;)</u><sub>exponentially decaying residual</sub>
+      </div>
+      <div class="eq-num">(3)</div>
+    </div>
+
+    <ul>
+      <li><strong>Singular homogeneous part</strong> &mdash; Integrated analytically over each piecewise-constant concentric pressure ring [<em>r<sub>j</sub></em>, <em>r</em><sub><em>j</em>+1</sub>] using complete elliptic integrals of the first and second kind (<code>EllipK</code>, <code>EllipE</code>), with series expansions near the <em>r = r<sub>j</sub></em> logarithmic singularity.</li>
+      <li><strong>Smooth coated residual &Delta;<em>G<sub>zz</sub></em>(&xi;)</strong> &mdash; Integrated with 12-point Gauss-Legendre panels up to &xi;<sub>max</sub><em>h</em><sub>1</sub> &ge; 25 (plus Filon oscillatory quadrature for very thin films), and added with the elastic indenter compliance 2(1 &minus; &nu;<sub><em>b</em></sub><sup>2</sup>) / (<em>E<sub>b</sub></em>&xi;) when the ball is deformable.</li>
+    </ul>
+
+    <h2>4. Polonsky-Keer Conjugate Gradient (CG) Contact Solver</h2>
+
+    <p>
+      Discretizing the contact radius domain into <em>M</em> uniform concentric rings gives the influence matrix
+      <em>D<sub>ij</sub></em> linking ring pressure <em>p<sub>j</sub></em> to normal surface deflection
+      <em>w<sub>i</sub></em> = &Sigma;<sub><em>j</em></sub> <em>D<sub>ij</sub> p<sub>j</sub></em>.
+      Engine 1 solves the normal contact complementarity problem via the Polonsky-Keer active-set CG iteration:
+    </p>
+
+    <div class="equation">
+      <div class="eq-body">
+        <em>p<sub>i</sub></em> &ge; 0, &nbsp;&nbsp;<em>g<sub>i</sub></em> = <em>w<sub>i</sub></em> + <em>h</em><sub>gap</sub>(<em>r<sub>i</sub></em>) &minus; &delta; &ge; 0,
+        &nbsp;&nbsp;<em>p<sub>i</sub> g<sub>i</sub></em> = 0, &nbsp;&nbsp;&Sigma;<sub><em>i</em></sub> <em>A<sub>i</sub> p<sub>i</sub></em> = <em>F<sub>N</sub></em>
+      </div>
+      <div class="eq-num">(4)</div>
+    </div>
+
+    <p>
+      The spherical gap <em>h</em><sub>gap</sub>(<em>r</em>) uses <em>r</em><sup>2</sup> / (2<em>R</em>) for small contact
+      angles and exact spherical geometry <em>R</em> &minus; &radic;(<em>R</em><sup>2</sup> &minus; <em>r</em><sup>2</sup>)
+      when <em>r</em><sub>max</sub> / <em>R</em> &gt; 0.05. The grid automatically adapts (up to 2 re-grids) so the
+      solved contact radius <em>a</em> occupies roughly 25%&ndash;85% of <em>r</em><sub>max</sub>.
+    </p>
+
+    <h2>5. Dual-Sided Interface Evaluation &amp; 3D Sliding Friction (&mu; &gt; 0)</h2>
+
+    <p>
+      Subsurface stress evaluation samples internal layer points plus exact boundary rows above
+      (<em>z<sub>k</sub></em><sup>&minus;</sup>) and below (<em>z<sub>k</sub></em><sup>+</sup>) every interface.
+      Interfacial displacement-traction vectors propagate downward cleanly through the already-computed stiffness
+      transfer matrices <strong>T</strong><sub><em>k</em></sub> = &minus;(<strong>K</strong><sub>22</sub> + <strong>K</strong><sub>below</sub>)<sup>&minus;1</sup><strong>K</strong><sub>21</sub>,
+      avoiding overflowing exp(+&xi;<em>z</em>).
+    </p>
+
+    <p>
+      When &mu; &gt; 0, tangential traction <em>q</em>(<em>r</em>) = &mu;&thinsp;<em>p</em>(<em>r</em>) acts along +<em>x</em>
+      on the contact patch. Decomposing the surface traction vector into azimuthal mode <em>m</em> = 1 couples two
+      independent linear boundary-value problems:
+    </p>
+    <ul>
+      <li><strong>P-SV mode</strong> &mdash; Uses the 2&times;2 SMM compliance matrix to capture in-plane and vertical normal/shear response.</li>
+      <li><strong>SH mode</strong> &mdash; Uses a decoupled 1D scalar stiffness matrix recursion for out-of-plane antiplane shear displacement <em>V</em><sub>SH</sub>(&xi;).</li>
+    </ul>
+
+    <p>
+      Consistent with Hamilton (1983) on a homogeneous half-space, sliding induces a strong tensile peak in
+      &sigma;<sub><em>xx</em></sub> at the <strong>trailing edge</strong> (<em>x = &minus;a, y = z = 0</em>) where
+      normal compression vanishes and friction-induced tension peaks:
+    </p>
+
+    <div class="equation">
+      <div class="eq-body">
+        &sigma;<sub><em>xx</em></sub><sup>max</sup>(&minus;<em>a</em>, 0, 0) =
+        <em>p</em><sub>0</sub>
+        [ <span class="frac"><span class="num">1 &minus; 2&nu;</span><span class="den">3</span></span>
+        + &mu;&pi; <span class="frac"><span class="num">4 + &nu;</span><span class="den">8</span></span> ]
+      </div>
+      <div class="eq-num">(5)</div>
+    </div>
+
+    <div class="callout warning">
+      <div class="callout-title">Scope of Engine 1</div>
+      Engine 1 assumes purely linear elasticity, infinitesimal strains, and uncoupled normal-tangential contact
+      pressure (Goodman's approximation, neglecting Dundurs mismatch &beta; in <em>p(r)</em>). When any layer or
+      substrate reaches &sigma;<sub>vM</sub> / &sigma;<sub><em>Y</em></sub> &gt; 0.95, switch to or compare with Engine 2 FEM.
+    </div>
+
+    <div class="page-nav">
+      <a href="physics-hertz.html">&larr; Previous: Classical Hertz Baselines</a>
+      <a href="physics-fem-plasticity.html" class="next">Next: CalculiX Elastic-Plastic FEM &rarr;</a>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  APS Technology &mdash; TriboContact Help &amp; Physics Reference
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{7B4E8A12-1D3C-4895-8B20-9F6A14C3D501}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="TriboContact.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="TriboContactCLI.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="tests\TriboContactTests.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="TriboContact">
+        <MSBuild Projects="TriboContact.dproj"/>
+    </Target>
+    <Target Name="TriboContact:Clean">
+        <MSBuild Projects="TriboContact.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="TriboContact:Make">
+        <MSBuild Projects="TriboContact.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="TriboContactCLI">
+        <MSBuild Projects="TriboContactCLI.dproj"/>
+    </Target>
+    <Target Name="TriboContactCLI:Clean">
+        <MSBuild Projects="TriboContactCLI.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="TriboContactCLI:Make">
+        <MSBuild Projects="TriboContactCLI.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="TriboContactTests">
+        <MSBuild Projects="tests\TriboContactTests.dproj"/>
+    </Target>
+    <Target Name="TriboContactTests:Clean">
+        <MSBuild Projects="tests\TriboContactTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="TriboContactTests:Make">
+        <MSBuild Projects="tests\TriboContactTests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="TriboContact;TriboContactCLI;TriboContactTests"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="TriboContact:Clean;TriboContactCLI:Clean;TriboContactTests:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="TriboContact:Make;TriboContactCLI:Make;TriboContactTests:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

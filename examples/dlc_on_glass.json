@@ -1,0 +1,49 @@
+{
+  "case_name": "DLC 1.5um on Glass Sliding mu=0.20 (Si3N4 6mm, 2N)",
+  "ball": {
+    "radius_um": 3000.0,
+    "material": {
+      "name": "Si3N4",
+      "E_gpa": 310.0,
+      "nu": 0.27,
+      "hardness_gpa": 16.0,
+      "category": "ball"
+    },
+    "rigid": false
+  },
+  "layers": [
+    {
+      "material": {
+        "name": "DLC",
+        "E_gpa": 180.0,
+        "nu": 0.22,
+        "sigma_y_gpa": 5.5,
+        "hardness_gpa": 20.0,
+        "category": "coating"
+      },
+      "thickness_um": 1.5
+    }
+  ],
+  "substrate": {
+    "name": "Glass",
+    "E_gpa": 72.0,
+    "nu": 0.22,
+    "sigma_y_gpa": 1.5,
+    "hardness_gpa": 6.0,
+    "category": "substrate"
+  },
+  "load_case": {
+    "normal_load_mn": 2000.0,
+    "friction_coeff": 0.20
+  },
+  "solver": {
+    "engine": "both",
+    "n_rings": 160,
+    "mesh_density": "standard",
+    "element_type": "CAX4",
+    "include_unloading": false,
+    "max_load_brackets": 3,
+    "load_tolerance_rel": 0.01,
+    "timeout_s": 300
+  }
+}

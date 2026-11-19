@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classical Hertz Baselines &mdash; TriboContact Physics</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="images/logo.png" type="image/png">
+</head>
+<body>
+
+<header class="site-header">
+  <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+  <img src="images/logo.png" alt="APS Technology" class="logo">
+  <div class="title">TriboContact <span>User Manual &amp; Physics Reference</span></div>
+</header>
+
+<aside class="sidebar">
+  <nav>
+    <ul>
+      <li><span class="nav-section">Overview</span></li>
+      <li><a href="index.html">Welcome &amp; Architecture</a></li>
+      <li><a href="getting-started.html">GUI &amp; CLI Guide</a></li>
+      <li><span class="nav-section">Contact Mechanics Physics</span></li>
+      <li><a href="physics-hertz.html" class="active">Classical Hertz Baselines</a></li>
+      <li><a href="physics-elastic-layered.html">Layered Elastic Solver (Engine 1)</a></li>
+      <li><a href="physics-fem-plasticity.html">CalculiX Elastic-Plastic FEM (Engine 2)</a></li>
+      <li><span class="nav-section">Reference</span></li>
+      <li><a href="materials-and-units.html">Materials &amp; Units</a></li>
+      <li><a href="verification-and-references.html">Validation &amp; Literature References</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <div class="content-body">
+
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> <span class="sep">&rsaquo;</span> Classical Hertz Baselines
+    </div>
+
+    <h1>Classical Hertz Contact Baselines</h1>
+    <p class="page-subtitle">Analytical homogeneous baselines and physical bounds for coated indentation</p>
+
+    <p>
+      For every simulation case, TriboContact computes two closed-form Hertz reference solutions alongside the
+      layered solvers: <code>hertz_substrate</code> (bare substrate properties <em>E<sub>s</sub>, &nu;<sub>s</sub></em>)
+      and <code>hertz_top_film</code> (semi-infinite top-film properties <em>E</em><sub>1</sub>, &nu;<sub>1</sub>).
+      When coating thickness is much smaller than the contact radius (<em>h / a &rarr; 0</em>), the coated response
+      approaches <code>hertz_substrate</code>; when the coating is thick compared with the contact radius
+      (<em>h / a &raquo; 1</em>), it approaches <code>hertz_top_film</code>.
+    </p>
+
+    <figure class="diagram">
+      <svg width="680" height="270" viewBox="0 0 680 270" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+            <path d="M0,1 L7,4 L0,7 Z" fill="#1a3064"/>
+          </marker>
+          <marker id="arr-red" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+            <path d="M0,1 L7,4 L0,7 Z" fill="#c62828"/>
+          </marker>
+          <radialGradient id="hertzBlob" cx="50%" cy="40%" r="55%">
+            <stop offset="0%" stop-color="#ffd54f" stop-opacity="0.85"/>
+            <stop offset="55%" stop-color="#ef6c00" stop-opacity="0.45"/>
+            <stop offset="100%" stop-color="#ef6c00" stop-opacity="0.0"/>
+          </radialGradient>
+        </defs>
+        <rect x="60" y="130" width="380" height="120" fill="#eef3fb" stroke="#1a3064" stroke-width="2"/>
+        <ellipse cx="250" cy="182" rx="75" ry="44" fill="url(#hertzBlob)"/>
+        <path d="M 110 25 A 145 145 0 0 0 390 25" fill="none" stroke="#2a4a8a" stroke-width="2.5"/>
+        <line x1="175" y1="130" x2="325" y2="130" stroke="#c62828" stroke-width="3.5"/>
+        <path d="M 175 130 C 195 72, 305 72, 325 130" fill="rgba(198,40,40,0.12)" stroke="#c62828" stroke-width="2"/>
+        <line x1="250" y1="14" x2="250" y2="60" stroke="#1a3064" stroke-width="2.2" marker-end="url(#arr)"/>
+        <text x="262" y="32" font-family="Segoe UI, sans-serif" font-size="14" font-weight="600" fill="#1a3064">F_N</text>
+        <line x1="250" y1="68" x2="250" y2="258" stroke="#666" stroke-width="1" stroke-dasharray="4 3"/>
+        <text x="256" y="102" font-family="Segoe UI, sans-serif" font-size="13" font-weight="600" fill="#c62828">p_0 = 1.5 p_mean</text>
+        <line x1="175" y1="144" x2="250" y2="144" stroke="#333" stroke-width="1.3"/>
+        <line x1="175" y1="138" x2="175" y2="150" stroke="#333" stroke-width="1.3"/>
+        <line x1="250" y1="138" x2="250" y2="150" stroke="#333" stroke-width="1.3"/>
+        <text x="205" y="160" font-family="Segoe UI, sans-serif" font-size="13" fill="#222">a</text>
+        <circle cx="250" cy="180" r="4" fill="#c62828"/>
+        <text x="262" y="185" font-family="Segoe UI, sans-serif" font-size="13" fill="#1a3064">max &sigma;_vM &approx; 0.62 p_0 at z &approx; 0.48 a</text>
+        <text x="480" y="65" font-family="Segoe UI, sans-serif" font-size="14" font-weight="600" fill="#1a3064">Centerline Stresses (r = 0)</text>
+        <line x1="480" y1="90" x2="640" y2="90" stroke="#1a3064" stroke-width="1.5"/>
+        <line x1="480" y1="90" x2="480" y2="230" stroke="#1a3064" stroke-width="1.5"/>
+        <path d="M 595 90 Q 565 138 518 220" fill="none" stroke="#2a4a8a" stroke-width="2"/>
+        <path d="M 520 90 Q 600 132 496 220" fill="none" stroke="#c62828" stroke-width="2.4"/>
+        <text x="580" y="148" font-family="Segoe UI, sans-serif" font-size="12" fill="#c62828">&sigma;_vM(z)</text>
+        <text x="540" y="195" font-family="Segoe UI, sans-serif" font-size="12" fill="#2a4a8a">|&sigma;_zz(z)|</text>
+        <text x="485" y="245" font-family="Segoe UI, sans-serif" font-size="12" fill="#666">Depth z / a</text>
+      </svg>
+      <figcaption>Figure 1 &mdash; Classical Hertz spherical contact pressure p(r), contact radius a, and subsurface von Mises stress maximum at z &approx; 0.48a.</figcaption>
+    </figure>
+
+    <h2>Governing Analytical Equations</h2>
+
+    <p>
+      For a sphere of radius <em>R</em> (material <em>E<sub>b</sub>, &nu;<sub>b</sub></em>) in frictionless elastic
+      contact with a homogeneous half-space (material <em>E<sub>t</sub>, &nu;<sub>t</sub></em>), the combined reduced
+      modulus <em>E</em><sup>*</sup> is:
+    </p>
+
+    <div class="equation">
+      <div class="eq-body">
+        <span class="frac"><span class="num">1</span><span class="den"><em>E</em><sup>*</sup></span></span>
+        = <span class="frac"><span class="num">1 &minus; &nu;<sub><em>t</em></sub><sup>2</sup></span><span class="den"><em>E<sub>t</sub></em></span></span>
+        + <span class="frac"><span class="num">1 &minus; &nu;<sub><em>b</em></sub><sup>2</sup></span><span class="den"><em>E<sub>b</sub></em></span></span>
+        &nbsp;&nbsp;(rigid ball: second term = 0)
+      </div>
+      <div class="eq-num">(1)</div>
+    </div>
+
+    <p>Under normal load <em>F<sub>N</sub></em>, contact radius <em>a</em>, indenter approach &delta;, peak pressure <em>p</em><sub>0</sub>, mean pressure <em>p</em><sub>mean</sub>, and radial pressure profile <em>p</em>(<em>r</em>) follow:</p>
+
+    <div class="equation">
+      <div class="eq-body">
+        <em>a</em> =
+        ( <span class="frac"><span class="num">3 <em>F<sub>N</sub> R</em></span><span class="den">4 <em>E</em><sup>*</sup></span></span> )<sup>1/3</sup>,
+        &nbsp;&nbsp;&delta; = <span class="frac"><span class="num"><em>a</em><sup>2</sup></span><span class="den"><em>R</em></span></span>,
+        &nbsp;&nbsp;<em>p</em><sub>0</sub> = <span class="frac"><span class="num">3 <em>F<sub>N</sub></em></span><span class="den">2 &pi; <em>a</em><sup>2</sup></span></span> = <span class="frac"><span class="num">3</span><span class="den">2</span></span> <em>p</em><sub>mean</sub>
+      </div>
+      <div class="eq-num">(2)</div>
+    </div>
+
+    <div class="equation">
+      <div class="eq-body">
+        <em>p</em>(<em>r</em>) = <em>p</em><sub>0</sub> &radic;(1 &minus; (<em>r</em>/<em>a</em>)<sup>2</sup>) &nbsp;&nbsp;for <em>r</em> &le; <em>a</em>,
+        &nbsp;&nbsp;&nbsp;<em>p</em>(<em>r</em>) = 0 &nbsp;for <em>r</em> &gt; <em>a</em>
+      </div>
+      <div class="eq-num">(3)</div>
+    </div>
+
+    <h2>Subsurface Centerline Stresses &amp; Yield Onset</h2>
+
+    <p>Along the symmetry axis (<em>r = 0</em>, normalized depth &zeta; = <em>z / a</em>), the principal compressive stresses and von Mises equivalent stress are:</p>
+
+    <div class="equation">
+      <div class="eq-body">
+        &sigma;<sub><em>zz</em></sub> = &minus;<span class="frac"><span class="num"><em>p</em><sub>0</sub></span><span class="den">1 + &zeta;<sup>2</sup></span></span>,
+        &nbsp;&nbsp;&sigma;<sub><em>rr</em></sub> = &sigma;<sub>&theta;&theta;</sub> = &minus;<em>p</em><sub>0</sub>
+        [ (1 + &nu;)(1 &minus; &zeta; arctan(1/&zeta;)) &minus; <span class="frac"><span class="num">1</span><span class="den">2(1 + &zeta;<sup>2</sup>)</span></span> ]
+      </div>
+      <div class="eq-num">(4)</div>
+    </div>
+
+    <div class="equation">
+      <div class="eq-body">
+        &sigma;<sub>vM</sub>(0, <em>z</em>) = |&sigma;<sub><em>zz</em></sub> &minus; &sigma;<sub><em>rr</em></sub>| = 2 &tau;<sub>max</sub>(0, <em>z</em>)
+      </div>
+      <div class="eq-num">(5)</div>
+    </div>
+
+    <p>
+      For Poisson's ratio &nu; = 0.30, &sigma;<sub>vM</sub> reaches its subsurface peak of approximately
+      <strong>0.620 <em>p</em><sub>0</sub></strong> at depth <strong><em>z</em> &approx; 0.481 <em>a</em></strong>.
+      Therefore, initial yielding (&sigma;<sub>vM</sub> = &sigma;<sub><em>Y</em></sub>) occurs at:
+    </p>
+
+    <div class="equation">
+      <div class="eq-body">
+        <em>p</em><sub>0,yield</sub> &approx; <span class="frac"><span class="num">&sigma;<sub><em>Y</em></sub></span><span class="den">0.620</span></span> &approx; <strong>1.61 &sigma;<sub><em>Y</em></sub></strong>
+        &nbsp;&nbsp;(&hArr; &nbsp;<em>p</em><sub>mean,yield</sub> &approx; 1.07 &sigma;<sub><em>Y</em></sub>)
+      </div>
+      <div class="eq-num">(6)</div>
+    </div>
+
+    <div class="callout info">
+      <div class="callout-title">Assumptions &amp; Limitations</div>
+      Classical Hertz theory assumes frictionless contact, infinite half-space geometry, small slopes
+      (<em>a &laquo; R</em>), homogeneous isotropic linear elasticity, and no coatings. In coated specimens,
+      modulus mismatch redistributes contact pressure and concentrates radial bending/tensile stresses across interfaces;
+      when &sigma;<sub>vM</sub> exceeds &sigma;<sub><em>Y</em></sub>, Engine 2 FEM is needed to model plastic spreading.
+    </div>
+
+    <div class="page-nav">
+      <a href="getting-started.html">&larr; Previous: GUI &amp; CLI Guide</a>
+      <a href="physics-elastic-layered.html" class="next">Next: Layered Elastic Solver (Engine 1) &rarr;</a>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  APS Technology &mdash; TriboContact Help &amp; Physics Reference
+</footer>
+
+</body>
+</html>
